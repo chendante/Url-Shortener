@@ -6,6 +6,5 @@ import (
 
 func main() {
 	r := router.InitRouter()
-
 	_ = r.Run("localhost:8000")
 }

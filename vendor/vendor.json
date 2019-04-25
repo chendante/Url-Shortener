@@ -3,6 +3,11 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "bWE6HuAe7EwPjKZt8Ntx3KDG4c8=",
+			"path": "database",
+			"revision": ""
+		},
+		{
 			"checksumSHA1": "BhMowD2DIKSd9qq8Pzh7Y3mh2/w=",
 			"path": "github.com/gin-contrib/sse",
 			"revision": "5545eab6dad3bbbd6c5ae9186383c2a9d23c0dae",
@@ -39,6 +44,12 @@
 			"revisionTime": "2018-08-14T08:58:52Z",
 			"version": "v1.3",
 			"versionExact": "v1.3.0"
+		},
+		{
+			"checksumSHA1": "zLfVtC5L5NnbKN9XH1Lrb3lbC2g=",
+			"path": "github.com/go-sql-driver/mysql",
+			"revision": "d0a548181995c293eb09c61ef80099ba1cdbe8f5",
+			"revisionTime": "2019-04-23T11:20:50Z"
 		},
 		{
 			"checksumSHA1": "Wp97rIwFg54dNwuCeR9Vslaehtw=",
@@ -78,6 +89,10 @@
 		},
 		{
 			"path": "golang.org/x/sys/unix",
+			"revision": ""
+		},
+		{
+			"path": "google.golang.org/appengine/cloudsql",
 			"revision": ""
 		},
 		{
