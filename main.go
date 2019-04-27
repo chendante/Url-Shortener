@@ -1,8 +1,6 @@
 package main
 
-import (
-	"Url-Shortener/router"
-)
+import "Url-Shortener/router"
 
 func main() {
 	r := router.InitRouter()

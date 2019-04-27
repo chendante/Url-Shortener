@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gomodule/redigo/redis"
 	"io/ioutil"
 )
 
 var Db *sql.DB
+var MRedis redis.Conn
 
 func init() {
 	var err error
@@ -27,5 +29,11 @@ func init() {
 	err = Db.Ping()
 	if err != nil {
 		fmt.Print(err.Error())
+	}
+
+	MRedis, err = redis.Dial("tcp", dataLoaded["address"])
+	if err != nil {
+		fmt.Println("Connect to redis error", err)
+		return
 	}
 }

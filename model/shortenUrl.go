@@ -2,6 +2,7 @@ package model
 
 import (
 	. "Url-Shortener/model/base"
+	"github.com/gomodule/redigo/redis"
 )
 
 var db = make(map[string]string)
@@ -65,4 +66,29 @@ func SearchOriginUrlSQL(shortUrl string) (string, bool) {
 		}
 	}
 	return "", false
+}
+
+func SearchOriginUrlRedis(shortUrl string) (string, bool) {
+	originUrl, err := redis.String(MRedis.Do("GET", shortUrl))
+	if err != nil {
+		return "", false
+	} else {
+		return originUrl, true
+	}
+}
+
+func SearchOriginUrl(shortUrl string) (string, bool) {
+	originUrl, ok := SearchOriginUrlRedis(shortUrl)
+	if !ok{
+		originUrl, ok := SearchOriginUrlSQL(shortUrl)
+		if ok{
+			insertUrlRedis(urlPair{shortUrl:shortUrl, originUrl:originUrl})
+		}
+		return originUrl, ok
+	}
+	return originUrl, true
+}
+
+func insertUrlRedis(urlP urlPair) {
+	MRedis.Do("SET", urlP.shortUrl, urlP.originUrl)
 }

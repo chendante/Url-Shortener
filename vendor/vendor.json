@@ -58,6 +58,12 @@
 			"revisionTime": "2019-04-09T05:09:43Z"
 		},
 		{
+			"checksumSHA1": "vhKe9wj10D1F+Si2try073SXtZ0=",
+			"path": "github.com/gomodule/redigo/redis",
+			"revision": "39e2c31b7ca38b521ceb836620a269e62c895dc9",
+			"revisionTime": "2019-03-22T06:41:13Z"
+		},
+		{
 			"checksumSHA1": "Z7opAUYaWhAvx1qd1dWXdm9Ra6Q=",
 			"path": "github.com/json-iterator/go",
 			"revision": "0ff49de124c6f76f8494e194af75bde0f1a49a29",
