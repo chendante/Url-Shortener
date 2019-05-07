@@ -9,7 +9,8 @@ import (
 func ShortenUrl(c *gin.Context) {
 	url := c.PostForm("url")
 	res := model.ShortenUrl(url)
-	c.JSON(200, gin.H{
+
+	c.JSON(http.StatusOK, gin.H{
 		"success":  true,
 		"res": res,
 	})
@@ -18,5 +19,11 @@ func ShortenUrl(c *gin.Context) {
 func GetOriginUrl(c *gin.Context) {
 	url := c.Params.ByName("url")
 	res, ok := model.SearchOriginUrl(url)
-	c.JSON(http.StatusOK, gin.H{"url": res, "success": ok})
+	res = model.AddScript(res)
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	if ok {
+		c.String(http.StatusOK, res)
+	} else {
+		c.String(http.StatusNotFound, "")
+	}
 }

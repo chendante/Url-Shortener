@@ -3,6 +3,7 @@ package model
 import (
 	. "Url-Shortener/model/base"
 	"github.com/gomodule/redigo/redis"
+	"strings"
 )
 
 var db = make(map[string]string)
@@ -21,13 +22,11 @@ func ShortenUrl(longUrl string) string {
 	urlP.shortUrl = getShortUrl(longUrl)
 	urlP.originUrl = longUrl
 	insertUrlSQL(urlP)
-	//db[longUrl] = shortUrl
-	//reverseDb[shortUrl] = longUrl
 	return urlP.shortUrl
 }
 
 func insertUrlSQL(urlP urlPair) {
-	Db.Exec("insert INTO url(origin_url, short_url) values(?,?)", urlP.originUrl, urlP.shortUrl)
+	_, _ = Db.Exec("insert INTO url(origin_url, short_url) values(?,?)", urlP.originUrl, urlP.shortUrl)
 }
 
 func getShortUrl(longUrl string) string {
@@ -90,5 +89,15 @@ func SearchOriginUrl(shortUrl string) (string, bool) {
 }
 
 func insertUrlRedis(urlP urlPair) {
-	MRedis.Do("SET", urlP.shortUrl, urlP.originUrl)
+	_, _ = MRedis.Do("SET", urlP.shortUrl, urlP.originUrl)
+}
+
+func AddScript(url string) string {
+	var res = "<head><meta http-equiv=\"refresh\" content=\"0;url="
+	if !strings.HasPrefix(url, "http"){
+		res += "https://"
+	}
+	res += url
+	res += "\"></head>"
+	return res
 }
