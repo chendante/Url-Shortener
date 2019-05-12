@@ -7,27 +7,32 @@ import (
 	"strings"
 )
 
-var db = make(map[string]string)
-var reverseDb = make(map[string]string)
-
-type urlPair struct {
-	originUrl string
-	shortUrl  string
+type Url struct {
+	Id			uint	`gorm:"primary_key"`
+	OriginUrl	string
+	ShortUrl	string
+	Visits		int
+}
+func (Url) TableName() string {
+	return "url"
 }
 
 func ShortenUrl(longUrl string) string {
 	if shortUrl, ok := SearchShortUrlSQL(longUrl); ok{
 		return shortUrl
 	}
-	var urlP urlPair
-	urlP.shortUrl = getShortUrl(longUrl)
-	urlP.originUrl = longUrl
+	var urlP Url
+	urlP.ShortUrl = getShortUrl(longUrl)
+	urlP.OriginUrl = longUrl
 	insertUrlSQL(urlP)
-	return urlP.shortUrl
+	return urlP.ShortUrl
 }
 
-func insertUrlSQL(urlP urlPair) {
-	_, _ = Db.Exec("insert INTO url(origin_url, short_url) values(?,?)", urlP.originUrl, urlP.shortUrl)
+func insertUrlSQL(urlP Url) {
+	Db.Create(&urlP)
+	if !Db.NewRecord(urlP){
+		fmt.Print("yes")
+	}
 }
 
 func getShortUrl(longUrl string) string {
@@ -46,26 +51,25 @@ func getShortUrl(longUrl string) string {
 }
 
 func SearchShortUrlSQL(longUrl string) (string, bool) {
-	// shortUrl, ok := db [longUrl]
-	urlP := new(urlPair)
-	row := Db.QueryRow("select short_url from url where origin_url = ?", longUrl)
-	if err := row.Scan(&urlP.shortUrl); err == nil{
-		if urlP.shortUrl != ""{
-			return urlP.shortUrl, true
-		}
+	urlP := Url{OriginUrl:longUrl}
+	var result Url
+	Db.Where(&urlP).First(&result)
+	if result.Id == 0{
+		return "", false
+	} else {
+		return result.ShortUrl, true
 	}
-	return "", false
 }
 
 func SearchOriginUrlSQL(shortUrl string) (string, bool) {
-	urlP := new(urlPair)
-	row := Db.QueryRow("select origin_url from url where short_url = ?", shortUrl)
-	if err := row.Scan(&urlP.originUrl); err == nil{
-		if urlP.originUrl != ""{
-			return urlP.originUrl, true
-		}
+	urlP := Url{ShortUrl:shortUrl}
+	var res Url
+	Db.Where(&urlP).First(&res)
+	if res.Id == 0{
+		return "", false
+	} else {
+		return res.OriginUrl, true
 	}
-	return "", false
 }
 
 func SearchOriginUrlRedis(shortUrl string) (string, bool) {
@@ -82,20 +86,23 @@ func SearchOriginUrl(shortUrl string) (string, bool) {
 	if !ok{
 		originUrl, ok := SearchOriginUrlSQL(shortUrl)
 		if ok{
-			insertUrlRedis(urlPair{shortUrl:shortUrl, originUrl:originUrl})
+			insertUrlRedis(Url{ShortUrl:shortUrl, OriginUrl:originUrl})
 		}
 		return originUrl, ok
 	}
 	return originUrl, true
 }
 
-func insertUrlRedis(urlP urlPair) {
-	_, _ = MRedis.Do("SET", urlP.shortUrl, urlP.originUrl)
+func insertUrlRedis(urlP Url) {
+	_, _ = MRedis.Do("SET", urlP.ShortUrl, urlP.OriginUrl)
 }
+
+//func updateUrlVisits(origin_url string) {
+//
+//}
 
 func AddScript(url string) string {
 	var res = "<head><meta http-equiv=\"refresh\" content=\"0;url="
-	fmt.Print("adsfadsfasdf")
 	if !strings.HasPrefix(url, "http"){
 		res += "https://"
 	}

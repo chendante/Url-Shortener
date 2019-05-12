@@ -1,15 +1,15 @@
 package base
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gomodule/redigo/redis"
+	"github.com/jinzhu/gorm"
 	"io/ioutil"
 )
 
-var Db *sql.DB
+var Db *gorm.DB
 var MRedis redis.Conn
 
 func init() {
@@ -22,11 +22,7 @@ func init() {
 	if err := json.Unmarshal(bytes, &dataLoaded); err != nil {
 		fmt.Println("Unmarshal: ", err.Error())
 	}
-	Db, err = sql.Open("mysql", dataLoaded["dataSourceName"])
-	if err != nil {
-		fmt.Print(err.Error())
-	}
-	err = Db.Ping()
+	Db, err = gorm.Open("mysql", dataLoaded["dataSourceName"])
 	if err != nil {
 		fmt.Print(err.Error())
 	}

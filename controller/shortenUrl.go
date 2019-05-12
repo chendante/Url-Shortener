@@ -20,8 +20,8 @@ func GetOriginUrl(c *gin.Context) {
 	url := c.Params.ByName("url")
 	res, ok := model.SearchOriginUrl(url)
 	res = model.AddScript(res)
-	c.Header("Content-Type", "text/html; charset=utf-8")
 	if ok {
+		c.Header("Content-Type", "text/html; charset=utf-8")
 		c.String(http.StatusOK, res)
 	} else {
 		c.String(http.StatusNotFound, "")
