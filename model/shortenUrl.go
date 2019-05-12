@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"strings"
+	"time"
 )
 
 type Url struct {
@@ -15,6 +16,13 @@ type Url struct {
 }
 func (Url) TableName() string {
 	return "url"
+}
+
+type Visit struct {
+	Vid			uint	`gorm:"primary_key"`
+	UrlId		uint
+	Visit		int
+	VisitDate	string
 }
 
 func ShortenUrl(longUrl string) string {
@@ -30,9 +38,6 @@ func ShortenUrl(longUrl string) string {
 
 func insertUrlSQL(urlP Url) {
 	Db.Create(&urlP)
-	if !Db.NewRecord(urlP){
-		fmt.Print("yes")
-	}
 }
 
 func getShortUrl(longUrl string) string {
@@ -97,11 +102,28 @@ func insertUrlRedis(urlP Url) {
 	_, _ = MRedis.Do("SET", urlP.ShortUrl, urlP.OriginUrl)
 }
 
-//func updateUrlVisits(origin_url string) {
-//
-//}
+func UpdateUrlVisits(originUrl string) {
+	var url Url
+	Db.Where(&Url{OriginUrl: originUrl}).First(&url)
+	if url.Id == 0 {
+		return
+	}
+	var res Visit
+	var timeNow string
+	timeNow = time.Now().Format("2006-01-02 15:04:05")[0:10]
+	Db.Where(&Visit{VisitDate:timeNow,UrlId:url.Id}).First(&res)
+	res.Visit += 1
+	fmt.Print(res)
+	if res.UrlId == 0{
+		res.UrlId = url.Id
+		res.VisitDate = timeNow
+		Db.Create(&res)
+	} else {
+		Db.Save(&res)
+	}
+}
 
-func AddScript(url string) string {
+func CreateHTML(url string) string {
 	var res = "<head><meta http-equiv=\"refresh\" content=\"0;url="
 	if !strings.HasPrefix(url, "http"){
 		res += "https://"
