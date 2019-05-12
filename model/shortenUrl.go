@@ -2,6 +2,7 @@ package model
 
 import (
 	. "Url-Shortener/model/base"
+	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"strings"
 )
@@ -94,6 +95,7 @@ func insertUrlRedis(urlP urlPair) {
 
 func AddScript(url string) string {
 	var res = "<head><meta http-equiv=\"refresh\" content=\"0;url="
+	fmt.Print("adsfadsfasdf")
 	if !strings.HasPrefix(url, "http"){
 		res += "https://"
 	}
