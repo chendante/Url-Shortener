@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Url-Shortener/model"
 	"fmt"
 	"github.com/Shopify/sarama"
 	"time"
@@ -29,6 +30,7 @@ func TestConsumer() {
 		case msg := <-partitionConsumer.Messages():
 			fmt.Printf("msg offset: %d, partition: %d, timestamp: %s, value: %s\n",
 				msg.Offset, msg.Partition, msg.Timestamp.String(), string(msg.Value))
+			model.UpdateUrlVisits(string(msg.Value))
 		case err := <-partitionConsumer.Errors():
 			fmt.Printf("err :%s\n", err.Error())
 		}

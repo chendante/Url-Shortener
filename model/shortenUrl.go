@@ -3,6 +3,7 @@ package model
 import (
 	. "Url-Shortener/model/base"
 	"fmt"
+	"github.com/Shopify/sarama"
 	"github.com/gomodule/redigo/redis"
 	"strings"
 	"time"
@@ -95,6 +96,7 @@ func SearchOriginUrl(shortUrl string) (string, bool) {
 		}
 		return originUrl, ok
 	}
+	SendMessage(originUrl)
 	return originUrl, true
 }
 
@@ -131,4 +133,23 @@ func CreateHTML(url string) string {
 	res += url
 	res += "\"></head>"
 	return res
+}
+
+func SendMessage(message string) {
+	config := sarama.NewConfig()
+	config.Producer.Return.Successes = true
+	config.Producer.Timeout = 5 * time.Second
+	p, err := sarama.NewSyncProducer([]string{"localhost:9092"}, config)
+	if err != nil {
+		fmt.Println("sarama.NewSyncProducer err, message=%s \n", err)
+		return
+	}
+	msg := &sarama.ProducerMessage{
+		Topic:"test",
+		Value:sarama.ByteEncoder(message),
+	}
+	_, _, err = p.SendMessage(msg)
+	if err != nil {
+		fmt.Println("send message err=%s \n", err.Error())
+	}
 }
