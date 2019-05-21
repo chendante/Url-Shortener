@@ -160,6 +160,12 @@
 			"revisionTime": "2018-10-16T18:43:25Z"
 		},
 		{
+			"checksumSHA1": "Co8o4cw9gGZpVUjZwNqmjJYXcqU=",
+			"path": "github.com/robfig/cron",
+			"revision": "b41be1df696709bb6395fe435af20370037c0b4c",
+			"revisionTime": "2018-05-05T20:34:41Z"
+		},
+		{
 			"checksumSHA1": "lAnyCHIKy0711HV6Bgs9ODuSnAs=",
 			"path": "github.com/ugorji/go/codec",
 			"revision": "1d65431a5776db967ae5481e33b789f9ffcea0ec",

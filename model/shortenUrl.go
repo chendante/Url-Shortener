@@ -136,20 +136,12 @@ func CreateHTML(url string) string {
 }
 
 func SendMessage(message string) {
-	config := sarama.NewConfig()
-	config.Producer.Return.Successes = true
-	config.Producer.Timeout = 5 * time.Second
-	p, err := sarama.NewSyncProducer([]string{"localhost:9092"}, config)
-	if err != nil {
-		fmt.Println("sarama.NewSyncProducer err, message=%s \n", err)
-		return
-	}
 	msg := &sarama.ProducerMessage{
 		Topic:"test",
 		Value:sarama.ByteEncoder(message),
 	}
-	_, _, err = p.SendMessage(msg)
+	_, _, err := P.SendMessage(msg)
 	if err != nil {
-		fmt.Println("send message err=%s \n", err.Error())
+		fmt.Printf("send message err=%s \n", err.Error())
 	}
 }
