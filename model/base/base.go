@@ -39,6 +39,7 @@ func init() {
 	config := sarama.NewConfig()
 	config.Producer.Return.Successes = true
 	config.Producer.Timeout = 5 * time.Second
+	config.Version = sarama.V0_10_0_0
 	P, err = sarama.NewSyncProducer([]string{"localhost:9092"}, config)
 	if err != nil {
 		fmt.Printf("sarama.NewSyncProducer err, message=%s \n", err)

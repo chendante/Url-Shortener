@@ -24,6 +24,7 @@ func main() {
 
 func initConsumer() {
 	config := sarama.NewConfig()
+	config.Version = sarama.V0_10_0_0
 	config.Consumer.Offsets.CommitInterval = 1 * time.Second
 	var err error
 	consumer, err = sarama.NewConsumer([]string{"localhost:9092"}, config)
