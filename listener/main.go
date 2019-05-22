@@ -50,18 +50,17 @@ ConsumerLoop:
 			fmt.Printf("msg offset: %d, partition: %d, timestamp: %s, value: %s\n",
 				msg.Offset, msg.Partition, msg.Timestamp.String(), string(msg.Value))
 			if now.Unix() > msg.Timestamp.Unix() {
-				offset = msg.Offset
+				offset = msg.Offset + 1
 			} else {
 				break ConsumerLoop
 			}
 			model.UpdateUrlVisits(string(msg.Value))
 		case err := <-partitionConsumer.Errors():
 			fmt.Printf("err :%s\n", err.Error())
-		case <-time.After(time.Second * 10):
+		case <-time.After(time.Second * 5):
 			// 超时退出
 			break ConsumerLoop
 		}
 	}
-	offset += 1
 	partitionConsumer.Close()
 }
