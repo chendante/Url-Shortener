@@ -1,8 +1,10 @@
 package main
 
 import (
+	"Url-Shortener/model"
 	"fmt"
 	"github.com/Shopify/sarama"
+	"github.com/robfig/cron"
 	"time"
 )
 
@@ -10,8 +12,14 @@ var offset	int64
 var consumer sarama.Consumer
 
 func main() {
+	c := cron.New()
 	initConsumer()
-	TestConsumer()
+	err := c.AddFunc("0 0 2 * * ?", TestConsumer)	// 凌晨两点执行一次
+	if err != nil {
+		fmt.Printf("c.AddFunc error %s\n", err.Error())
+	}
+	c.Start()
+	select {}
 }
 
 func initConsumer() {
@@ -23,7 +31,8 @@ func initConsumer() {
 		fmt.Printf("consumer_test create consumer error %s\n", err.Error())
 		return
 	}
-	offset = 3
+	offset = sarama.OffsetOldest
+	fmt.Print("offset: ", offset)
 }
 
 func TestConsumer() {
@@ -32,15 +41,26 @@ func TestConsumer() {
 		fmt.Printf("try create partition_consumer error %s\n", err.Error())
 		return
 	}
+	now := time.Now()
+ConsumerLoop:
 	for {
 		select {
 		case msg := <-partitionConsumer.Messages():
 			fmt.Printf("msg offset: %d, partition: %d, timestamp: %s, value: %s\n",
 				msg.Offset, msg.Partition, msg.Timestamp.String(), string(msg.Value))
-			offset = msg.Offset
-			// model.UpdateUrlVisits(string(msg.Value))
+			if now.Unix() > msg.Timestamp.Unix() {
+				offset = msg.Offset
+			} else {
+				break ConsumerLoop
+			}
+			model.UpdateUrlVisits(string(msg.Value))
 		case err := <-partitionConsumer.Errors():
 			fmt.Printf("err :%s\n", err.Error())
+		case <-time.After(time.Second * 10):
+			// 超时退出
+			break ConsumerLoop
 		}
 	}
+	offset += 1
+	partitionConsumer.Close()
 }

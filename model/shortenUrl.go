@@ -112,7 +112,7 @@ func UpdateUrlVisits(originUrl string) {
 	}
 	var res Visit
 	var timeNow string
-	timeNow = time.Now().Format("2006-01-02 15:04:05")[0:10]
+	timeNow = time.Now().AddDate(0,0,-1).Format("2006-01-02 15:04:05")[0:10]
 	Db.Where(&Visit{VisitDate:timeNow,UrlId:url.Id}).First(&res)
 	res.Visit += 1
 	fmt.Print(res)
