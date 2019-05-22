@@ -139,6 +139,7 @@ func SendMessage(message string) {
 	msg := &sarama.ProducerMessage{
 		Topic:"test",
 		Value:sarama.ByteEncoder(message),
+		Timestamp:time.Now(),
 	}
 	_, _, err := P.SendMessage(msg)
 	if err != nil {
