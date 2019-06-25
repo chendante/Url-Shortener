@@ -1,6 +1,7 @@
 package base
 
 import (
+	"Url-Shortener/const"
 	"encoding/json"
 	"fmt"
 	"github.com/Shopify/sarama"
@@ -17,20 +18,12 @@ var P sarama.SyncProducer
 
 func init() {
 	var err error
-	bytes, err := ioutil.ReadFile("data.json")
-	if err != nil {
-		fmt.Println("ReadFile: ", err.Error())
-	}
-	var dataLoaded map[string]string
-	if err := json.Unmarshal(bytes, &dataLoaded); err != nil {
-		fmt.Println("Unmarshal: ", err.Error())
-	}
-	Db, err = gorm.Open("mysql", dataLoaded["dataSourceName"])
+	Db, err = gorm.Open("mysql", _const.DataSourceName)
 	if err != nil {
 		fmt.Print(err.Error())
 	}
 
-	MRedis, err = redis.Dial("tcp", dataLoaded["address"])
+	MRedis, err = redis.Dial("tcp", _const.Address)
 	if err != nil {
 		fmt.Println("Connect to redis error", err)
 		return
